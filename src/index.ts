@@ -152,4 +152,54 @@ app.post(
   }
 );
 
+app.get("/transactions", async (request, reply) => {
+  const [user1, user2, totalUsers] = await prismaClient.$transaction([
+    prismaClient.user.create({
+      data: {
+        name: "novo usuário 01",
+        email: "novo-usuario_01@email.com",
+      },
+    }),
+    prismaClient.user.create({
+      data: {
+        name: "novo usuário 02",
+        email: "novo-usuario_02@email.com",
+      },
+    }),
+    prismaClient.user.count(),
+  ]);
+
+  reply.send({ user1, user2, totalUsers });
+});
+
+app.get("/new-transactions", async (request, reply) => {
+  await prismaClient.$transaction(async (prisma) => {
+    const user1 = await prisma.user.create({
+      data: {
+        name: "novo usuário 01",
+        email: "novo-usuario_01@email.com",
+      },
+    });
+
+    if (user1) {
+      // aplica regras de negócio aqui!
+    }
+
+    const user2 = await prisma.user.create({
+      data: {
+        name: "novo usuário 02",
+        email: "novo-usuario_02@email.com",
+      },
+    });
+
+    if (user2) {
+      // aplica regras de negócio aqui!
+    }
+
+    const totalUsers = await prisma.user.count();
+
+    reply.send({ user1, user2, totalUsers });
+  });
+});
+
 app.listen({ port: 3001 }).then(() => console.log("Server is running!"));
