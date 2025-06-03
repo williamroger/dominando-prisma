@@ -86,4 +86,70 @@ app.get("/users/stats", async (request, reply) => {
   });
 });
 
+type UpdateUserBody = {
+  name?: string;
+  email?: string;
+  age?: number;
+  isActive?: boolean;
+};
+
+app.put(
+  "/users/:id",
+  async (
+    request: FastifyRequest<{ Params: { id: string }; Body: UpdateUserBody }>,
+    reply
+  ) => {
+    const { id } = request.params;
+    const { age, isActive, email, name } = request.body;
+
+    const user = await prismaClient.user.update({
+      data: { age, isActive, email, name },
+      where: {
+        id,
+      },
+    });
+
+    reply.send({ user });
+  }
+);
+
+app.put("/users/batch", async (request: FastifyRequest, reply) => {
+  const totalUsers = await prismaClient.user.updateMany({
+    data: { isActive: false },
+    where: {
+      email: {
+        endsWith: "@email.com",
+      },
+    },
+  });
+
+  reply.send({ totalUsers });
+});
+
+app.delete(
+  "/users/:id",
+  async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    const { id } = request.params;
+
+    const user = await prismaClient.user.delete({
+      where: { id },
+    });
+
+    reply.send({ user });
+  }
+);
+
+app.post(
+  "/",
+  async (request: FastifyRequest<{ Body: { id: string } }>, reply) => {
+    const { id } = request.body;
+    // exemplo de SQL Injection
+    const result = await prismaClient.$queryRawUnsafe(
+      `SELECT * FROM users WHERE id = '${id}'`
+    );
+
+    reply.send({ result });
+  }
+);
+
 app.listen({ port: 3001 }).then(() => console.log("Server is running!"));
