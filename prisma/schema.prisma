@@ -16,6 +16,21 @@ model User {
   age Int?
   isActive Boolean @default(true) @map("is_active") 
 
+  profile Profile?
+
   @@index([name])
   @@map("users")
 }
+
+model Profile {
+  id String @id @db.Uuid @default(uuid())
+  userId String @map("user_id") @db.Uuid @unique
+  instagram String?
+  github String?
+  bio String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("profiles")
+}
+
