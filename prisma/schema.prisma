@@ -41,6 +41,16 @@ model Order {
   value Float
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  products Product[]
 
   @@map("orders")
+}
+
+model Product {
+  id String @id @db.Uuid @default(uuid())
+  name String
+
+  orders Order[]
+  
+  @@map("products")
 }

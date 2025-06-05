@@ -220,4 +220,19 @@ app.get("/users/join", async (request, reply) => {
   reply.send({ users });
 });
 
+app.get("/orders", async (request, reply) => {
+  const orders = await prismaClient.order.findMany({
+    include: {
+      products: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  reply.send({ orders });
+});
+
 app.listen({ port: 3001 }).then(() => console.log("Server is running!"));
