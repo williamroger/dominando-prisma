@@ -225,8 +225,8 @@ app.get("/orders", async (request, reply) => {
     include: {
       products: {
         select: {
-          id: true,
-          name: true,
+          product: true,
+          quantity: true,
         },
       },
     },
