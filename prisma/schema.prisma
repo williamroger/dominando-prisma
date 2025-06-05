@@ -17,6 +17,7 @@ model User {
   isActive Boolean @default(true) @map("is_active") 
 
   profile Profile?
+  orders Order[]
 
   @@index([name])
   @@map("users")
@@ -34,3 +35,12 @@ model Profile {
   @@map("profiles")
 }
 
+model Order {
+  id String @id @db.Uuid @default(uuid())
+  userId String @map("user_id") @db.Uuid
+  value Float
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("orders")
+}

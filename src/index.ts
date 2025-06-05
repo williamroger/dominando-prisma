@@ -202,4 +202,22 @@ app.get("/new-transactions", async (request, reply) => {
   });
 });
 
+app.get("/users/join", async (request, reply) => {
+  const users = await prismaClient.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profile: {
+        select: {
+          github: true,
+          instagram: true,
+        },
+      },
+    },
+  });
+
+  reply.send({ users });
+});
+
 app.listen({ port: 3001 }).then(() => console.log("Server is running!"));
